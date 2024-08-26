@@ -11,7 +11,7 @@ public class DropItemArea : MonoBehaviour, IDropHandler
 
     public void OnDrop(PointerEventData eventData)
     {
-        if(OnDropEvent != null)
+        if (OnDropEvent != null)
         {
             OnDropEvent();
         }

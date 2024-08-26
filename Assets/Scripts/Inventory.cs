@@ -12,11 +12,6 @@ public class Inventory : ScriptableObject
         if (!items.Contains(item))
         {
             items.Add(item);
-            Debug.Log(item.itemName + " added to inventory.");
-        }
-        else
-        {
-            Debug.Log(item.itemName + " is already in the inventory.");
         }
     }
 
@@ -25,11 +20,6 @@ public class Inventory : ScriptableObject
         if (items.Contains(item))
         {
             items.Remove(item);
-            Debug.Log(item.itemName + " removed from inventory.");
-        }
-        else
-        {
-            Debug.Log(item.itemName + " not found in inventory.");
         }
     }
 

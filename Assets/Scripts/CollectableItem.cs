@@ -16,7 +16,6 @@ public class CollectableItem : MonoBehaviour
         {
             audioSource?.Play();
             InventoryManager.Instance.CollectItem(item);
-            Debug.Log("Collected: " + item.itemName);
             Destroy(gameObject);
 
         }

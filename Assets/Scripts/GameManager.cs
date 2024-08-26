@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class GameManager : MonoBehaviour
 {
@@ -21,6 +22,7 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -38,6 +40,8 @@ public class GameManager : MonoBehaviour
         LoadPlayerData();
         UpdateLifeStatus();
     }
+
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -54,10 +58,6 @@ public class GameManager : MonoBehaviour
             bgmSource.playOnAwake = true;
             audioSource.Play();
             bgmSource.Play();
-        }
-        else
-        {
-            Debug.LogWarning("AudioSource components are not assigned.");
         }
     }
 
@@ -83,8 +83,6 @@ public class GameManager : MonoBehaviour
             player.Die();
             FinishGame();
         }
-
-        Debug.Log("Player life: " + lives);
     }
 
     public void FinishGame()
@@ -100,10 +98,10 @@ public class GameManager : MonoBehaviour
         audioSource?.Stop();
         audioSource?.PlayOneShot(audioManager?.Win);
         yield return new WaitForSeconds(5);
-        PlayerPrefs.DeleteAll();
+        lives = 3;
+        UpdateLifeStatus();
         SceneManager.LoadScene("Game");
     }
-
 
     public void ToggleInventory(bool value)
     {
@@ -114,8 +112,9 @@ public class GameManager : MonoBehaviour
 
     public void UseItem(Item item)
     {
-        if (item is UsableItem usableItem && CheckCapacitable(usableItem.effect)) {
-            { 
+        if (item is UsableItem usableItem && CheckCapacitable(usableItem.effect))
+        {
+            {
                 InventoryManager.Instance.UseItem(usableItem);
                 ApplyItemEffect(usableItem.effect);
             }

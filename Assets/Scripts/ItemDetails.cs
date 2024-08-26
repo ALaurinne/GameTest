@@ -30,7 +30,8 @@ public class ItemDetails : MonoBehaviour
                 image.color = new Color(1, 1, 1, 1);
                 useButton.gameObject.SetActive(_item.itemType == ItemType.Usable); ;
 
-            } else
+            }
+            else
             {
                 itemName.text = null;
                 description.text = null;

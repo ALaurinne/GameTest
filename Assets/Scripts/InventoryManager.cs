@@ -32,10 +32,12 @@ public class InventoryManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
             Destroy(gameObject);
+            return;
         }
 
         UIinventory.OnDragEvent += OnDrag;
@@ -45,7 +47,7 @@ public class InventoryManager : MonoBehaviour
         UIinventory.OnPointerEnterEvent += ShowInfo;
         UIinventory.OnPointerExitEvent += HideInfo;
         UIinventory.OnLeftClickEvent += PinInfo;
-        dropArea.OnDropEvent += DropOutside; 
+        dropArea.OnDropEvent += DropOutside;
     }
 
     public void PinInfo(SlotItem slotItem)
@@ -71,7 +73,7 @@ public class InventoryManager : MonoBehaviour
 
     public void ShowInfo(SlotItem slotItem)
     {
-        if(isPinned) return;
+        if (isPinned) return;
 
         if (slotItem.item != null)
         {
@@ -90,19 +92,17 @@ public class InventoryManager : MonoBehaviour
             itemDetails.gameObject.SetActive(false);
         }
     }
-    
+
     public void CollectItem(Item item)
     {
-        if(inventory.items.Count < 6) {
-        if (!inventory.ContainsItem(item))
+        if (inventory.items.Count < 6)
         {
-            inventory.AddItem(item);
+            if (!inventory.ContainsItem(item))
+            {
+                inventory.AddItem(item);
+            }
         }
         else
-        {
-            Debug.Log("Already in inventory");
-        }
-        } else
         {
             Debug.Log("Inventory is full");
         }
@@ -138,7 +138,7 @@ public class InventoryManager : MonoBehaviour
         {
             draggedSlot = slotItem;
             draggableItem.sprite = slotItem.item.icon;
-            draggableItem.color = new Color (1, 1, 1, 1);
+            draggableItem.color = new Color(1, 1, 1, 1);
             draggableItem.transform.position = Input.mousePosition;
             draggableItem.enabled = true;
         }
@@ -168,7 +168,7 @@ public class InventoryManager : MonoBehaviour
 
 
     public void DropItem(Item item)
-    { 
+    {
         UIinventory.RefreshUI();
     }
 

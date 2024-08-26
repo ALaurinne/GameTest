@@ -145,7 +145,7 @@ public class SlotItem : MonoBehaviour, IPointerClickHandler, IPointerEnterHandle
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        isPointerOver = true; 
+        isPointerOver = true;
 
         if (OnPointerEnterEvent != null)
             OnPointerEnterEvent(this);
