@@ -1,12 +1,8 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public enum ItemType
 {
-    Life,
-    Speed,
+    Usable,
     Normal
 }
 
@@ -17,4 +13,6 @@ public class Item : ScriptableObject
     public string description;
     public Sprite icon;
     public ItemType itemType;
-    }
+
+}
+
