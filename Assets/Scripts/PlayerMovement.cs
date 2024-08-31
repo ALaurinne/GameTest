@@ -21,7 +21,6 @@ public class PlayerMovement : MonoBehaviour
     Animator animator;
     Rigidbody2D rb;
     bool jump;
-    float jumpCounter;
 
     Vector2 horizontalMove, gravity;
 
@@ -82,7 +81,7 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!canMove) return;
+        if (!canMove) { rb.velocity = new Vector2(0, 0);  return; };
         rb.velocity = new Vector2(horizontalMove.x * speed, rb.velocity.y);
 
         if (jump)

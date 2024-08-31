@@ -123,10 +123,11 @@ public class GameManager : MonoBehaviour
         InventoryManager.Instance.ClearInventory();
         bgmSource?.Stop();
         audioSource?.Stop();
+        yield return new WaitForSeconds(2);
         lives = 3;
-        yield return new WaitForSeconds(5);
         UpdateLifeStatus();
         SceneManager.LoadScene("Game");
+        yield return new WaitForSeconds(3);
         InitGame();
     }
 
