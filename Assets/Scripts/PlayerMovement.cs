@@ -82,6 +82,7 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         if (!canMove) { rb.velocity = new Vector2(0, 0);  return; };
+
         rb.velocity = new Vector2(horizontalMove.x * speed, rb.velocity.y);
 
         if (jump)

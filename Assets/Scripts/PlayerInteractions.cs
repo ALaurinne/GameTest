@@ -46,7 +46,7 @@ public class PlayerInteractions : MonoBehaviour
             audioSource?.PlayOneShot(audioManager.Hurt);
             animator.SetTrigger("Hurt");
             GameManager.Instance.Hurt();
-            rb.AddForce(new Vector2(-1, rb.velocity.y));
+            rb.AddForce(new Vector2(-1, 1));
         }
     }
 
