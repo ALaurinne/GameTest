@@ -7,12 +7,15 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    [SerializeField] private GameObject inventoryPanel;
+    [SerializeField] private UIInventory inventoryPanel;
     [SerializeField] private PlayerMovement player;
     [SerializeField] private PanelManager panelManager;
     [SerializeField] private AudioManager audioManager;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioSource bgmSource;
+
+
+    [SerializeField] private float impulseValue;
 
     private bool inventoryOpen;
     private int lives;
@@ -29,16 +32,20 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
-        InitializeAudio();
     }
 
     private void Start()
     {
-        player.canMove = true;
-        inventoryOpen = false;
+        InitGame();
+    }
+
+    private void InitGame()
+    {
+        player.InitGame();
+        ToggleInventory(false);
         LoadPlayerData();
         UpdateLifeStatus();
+        InitializeAudio();
     }
 
 
@@ -48,6 +55,21 @@ public class GameManager : MonoBehaviour
         {
             Application.Quit();
         }
+    }
+
+    public void SetPlayer(PlayerMovement player)
+    {
+        this.player = player;
+    }
+
+    public void SetPanelManager(PanelManager panelManager)
+    {
+        this.panelManager = panelManager;
+    }
+
+    public void SetUIInventory(UIInventory inventoryPanel)
+    {
+        this.inventoryPanel = inventoryPanel;
     }
 
     private void InitializeAudio()
@@ -80,34 +102,39 @@ public class GameManager : MonoBehaviour
 
         if (lives <= 0)
         {
-            player.Die();
-            FinishGame();
+            LoseGame();
         }
     }
 
-    public void FinishGame()
+    public void LoseGame()
     {
+        player.Die();
+        StartCoroutine(EndGame());
+    }
+
+    public void WinGame()
+    {
+        player.Win();
         StartCoroutine(EndGame());
     }
 
     private IEnumerator EndGame()
     {
-        player.canMove = false;
         InventoryManager.Instance.ClearInventory();
         bgmSource?.Stop();
         audioSource?.Stop();
-        audioSource?.PlayOneShot(audioManager?.Win);
-        yield return new WaitForSeconds(5);
         lives = 3;
+        yield return new WaitForSeconds(5);
         UpdateLifeStatus();
         SceneManager.LoadScene("Game");
+        InitGame();
     }
 
     public void ToggleInventory(bool value)
     {
         inventoryOpen = value;
         player.canMove = !inventoryOpen;
-        inventoryPanel?.SetActive(inventoryOpen);
+        inventoryPanel?.gameObject.SetActive(inventoryOpen);
     }
 
     public void UseItem(Item item)
@@ -148,9 +175,9 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator BoostJump()
     {
-        player.boost += 0.5f;
+        player.boost += impulseValue;
         yield return new WaitForSeconds(20);
-        player.boost -= 0.5f;
+        player.boost -= impulseValue;
 
         yield break;
     }

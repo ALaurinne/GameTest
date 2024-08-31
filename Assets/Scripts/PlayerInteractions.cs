@@ -2,11 +2,16 @@ using UnityEngine;
 
 public class PlayerInteractions : MonoBehaviour
 {
+    [SerializeField]
+    AudioManager audioManager;
+
+    AudioSource audioSource;
     Animator animator;
     Rigidbody2D rb;
 
     private void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
     }
@@ -21,7 +26,16 @@ public class PlayerInteractions : MonoBehaviour
         if (other.gameObject.CompareTag("End"))
         {
             animator.SetBool("Win", true);
-            GameManager.Instance.FinishGame();
+            audioSource?.PlayOneShot(audioManager.Win);
+            GameManager.Instance.WinGame();
+        }
+
+        if (other.gameObject.CompareTag("Collectable") && InventoryManager.Instance.CanCollect)
+        {
+            audioSource?.PlayOneShot(audioManager.Collect);
+            InventoryManager.Instance.CollectItem(other.GetComponent<CollectableItem>().item);
+            Destroy(other.gameObject);
+
         }
     }
 
@@ -29,6 +43,7 @@ public class PlayerInteractions : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Enemy"))
         {
+            audioSource?.PlayOneShot(audioManager.Hurt);
             animator.SetTrigger("Hurt");
             GameManager.Instance.Hurt();
             rb.AddForce(new Vector2(-1, rb.velocity.y));

@@ -1,111 +1,119 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
     public bool canMove;
     public float speed;
-    public float jumpForce;
     public float boost;
     public float distance;
     public Vector2 size;
     public LayerMask groundLayer;
 
+    [Header("Jump System")]
+    [SerializeField] float jumpForce;
+    [SerializeField] float jumpTime;
+    [SerializeField] float fallMultiplier;
+    [SerializeField] float jumpMultiplier;
+
     Animator animator;
     Rigidbody2D rb;
-
-    float horizontalMove;
     bool jump;
-    bool facingRight;
+    float jumpCounter;
+
+    Vector2 horizontalMove, gravity;
+
 
     void Start()
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         InitGame();
+        gravity = new Vector2(0, -Physics2D.gravity.y);
     }
 
     public void InitGame()
     {
+        GameManager.Instance.SetPlayer(this);
         canMove = true;
-        facingRight = true;
         animator.SetTrigger("Init");
         animator.SetBool("Win", false);
         animator.SetBool("Die", false);
     }
 
+    public void Win()
+    {
+        canMove = false;
+        animator.SetBool("Win", true);
+    }
+
     public void Die()
     {
+        canMove = false;
         animator.SetBool("Die", true);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Movement(InputAction.CallbackContext value)
     {
-        if (!canMove) return;
-        horizontalMove = Input.GetAxis("Horizontal") * speed;
+        horizontalMove = value.ReadValue<Vector2>();
+        animator.SetFloat("Run", Mathf.Abs(horizontalMove.x));
+        Flip();
+    }
 
-        animator.SetFloat("Run", Mathf.Abs(horizontalMove));
-
-        if (Input.GetButtonDown("Jump"))
+    public void Jump(InputAction.CallbackContext value)
+    {
+        if (value.started && isGrounded())
         {
+            animator.SetTrigger("Jump");
             jump = true;
         }
-
-        if (jump && isGrounded())
+        if (value.canceled)
         {
-            animator.SetBool("Jump", true);
-        }
-        if (!jump && isGrounded())
-        {
-            animator.SetBool("Jump", false);
+            jump = false;
         }
     }
 
     public bool isGrounded()
     {
-        if (Physics2D.BoxCast(transform.position, size, 0, -transform.up, distance, groundLayer))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return (Physics2D.BoxCast(transform.position, size, 0, -transform.up, distance, groundLayer));
     }
 
     void FixedUpdate()
     {
-        if (horizontalMove != 0)
+        if (!canMove) return;
+        rb.velocity = new Vector2(horizontalMove.x * speed, rb.velocity.y);
+
+        if (jump)
         {
-            rb.velocity = new Vector2(horizontalMove, rb.velocity.y);
-        }
-        if (jump && !isGrounded())
-        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce * boost);
             jump = false;
         }
-        if (isGrounded() && jump)
-        {
-            rb.AddForce(new Vector2(rb.velocity.x * 0.5f, jumpForce * 10 * boost));
-            jump = false;
 
-        }
-
-        if (horizontalMove > 0 && !facingRight)
+        if (rb.velocity.y < 0)
         {
-            Flip();
+            rb.velocity += Vector2.down * gravity.y * Time.deltaTime * fallMultiplier;
         }
-        else if (horizontalMove < 0 && facingRight)
+        else if (rb.velocity.y > 0 && !jump)
         {
-            Flip();
+            rb.velocity += Vector2.down * gravity.y * Time.deltaTime * (2* fallMultiplier / 3);
         }
     }
+
     void Flip()
     {
-        facingRight = !facingRight;
         var localScale = transform.localScale;
-        localScale.x *= -1;
+
+        if (horizontalMove.x < 0 && localScale.x > 0)
+        {
+            localScale.x *= -1;
+        }
+        else if (horizontalMove.x > 0 && localScale.x < 0)
+        {
+            localScale.x *= -1;
+        }
+
         transform.localScale = localScale;
     }
 

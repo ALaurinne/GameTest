@@ -10,4 +10,6 @@ public class AudioManager : ScriptableObject
     public AudioClip Win;
 
     public AudioClip Collect;
+
+    public AudioClip Hurt;
 }

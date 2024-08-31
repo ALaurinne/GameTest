@@ -10,16 +10,20 @@ public class UIInventory : MonoBehaviour
     [SerializeField]
     GameObject inventoryParent;
 
-
     [SerializeField]
     SlotItem[] itemsSlot;
-
 
     [SerializeField]
     Inventory inventory;
 
     [SerializeField]
     Button CloseInventoryButton;
+
+    public DropItemArea dropArea;
+
+    public Image draggableItem;
+
+    public ItemDetails itemDetails;
 
 
     public event Action<SlotItem> OnLeftClickEvent;
@@ -44,6 +48,7 @@ public class UIInventory : MonoBehaviour
 
         RefreshUI();
     }
+
     private void Start()
     {
         foreach (SlotItem item in itemsSlot)

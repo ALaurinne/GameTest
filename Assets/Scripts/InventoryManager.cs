@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,16 +11,7 @@ public class InventoryManager : MonoBehaviour
     private Inventory inventory;
 
     [SerializeField]
-    private UIInventory UIinventory;
-
-    [SerializeField]
-    private DropItemArea dropArea;
-
-    [SerializeField]
-    Image draggableItem;
-
-    [SerializeField]
-    ItemDetails itemDetails;
+    private UIInventory inventoryPanel;
 
     SlotItem draggedSlot;
 
@@ -40,20 +32,28 @@ public class InventoryManager : MonoBehaviour
             return;
         }
 
-        UIinventory.OnDragEvent += OnDrag;
-        UIinventory.OnDropEvent += OnDrop;
-        UIinventory.OnEndDragEvent += OnEndDrag;
-        UIinventory.OnBeginDragEvent += OnBeginDrag;
-        UIinventory.OnPointerEnterEvent += ShowInfo;
-        UIinventory.OnPointerExitEvent += HideInfo;
-        UIinventory.OnLeftClickEvent += PinInfo;
-        dropArea.OnDropEvent += DropOutside;
+        inventoryPanel.OnDragEvent += OnDrag;
+        inventoryPanel.OnDropEvent += OnDrop;
+        inventoryPanel.OnEndDragEvent += OnEndDrag;
+        inventoryPanel.OnBeginDragEvent += OnBeginDrag;
+        inventoryPanel.OnPointerEnterEvent += ShowInfo;
+        inventoryPanel.OnPointerExitEvent += HideInfo;
+        inventoryPanel.OnLeftClickEvent += PinInfo;
+        inventoryPanel.dropArea.OnDropEvent += DropOutside;
+    }
+
+    public void SetUIInventory(UIInventory inventoryPanel)
+    {
+        this.inventoryPanel = inventoryPanel;
     }
 
     public void PinInfo(SlotItem slotItem)
     {
-        isPinned = true;
-        StartCoroutine(RemovePin());
+        if (slotItem.item as UsableItem != null)
+        {
+            isPinned = true;
+            StartCoroutine(RemovePin());
+        }
     }
 
     IEnumerator RemovePin()
@@ -66,8 +66,8 @@ public class InventoryManager : MonoBehaviour
     public void DropOutside()
     {
         inventory.RemoveItem(draggedSlot.item);
-        draggableItem.color = new Color(1, 1, 1, 0);
-        draggableItem.enabled = false;
+        inventoryPanel.draggableItem.color = new Color(1, 1, 1, 0);
+        inventoryPanel.draggableItem.enabled = false;
         draggedSlot.item = null;
     }
 
@@ -77,8 +77,8 @@ public class InventoryManager : MonoBehaviour
 
         if (slotItem.item != null)
         {
-            itemDetails.Item = slotItem.item;
-            itemDetails.gameObject.SetActive(true);
+            inventoryPanel.itemDetails.Item = slotItem.item;
+            inventoryPanel.itemDetails.gameObject.SetActive(true);
         }
     }
 
@@ -86,10 +86,10 @@ public class InventoryManager : MonoBehaviour
     {
         if (isPinned) return;
 
-        if (itemDetails.gameObject.activeSelf)
+        if (inventoryPanel.itemDetails.gameObject.activeSelf)
         {
-            itemDetails.Item = null;
-            itemDetails.gameObject.SetActive(false);
+            inventoryPanel.itemDetails.Item = null;
+            inventoryPanel.itemDetails.gameObject.SetActive(false);
         }
     }
 
@@ -107,23 +107,23 @@ public class InventoryManager : MonoBehaviour
             Debug.Log("Inventory is full");
         }
 
-        UIinventory.RefreshUI();
+        inventoryPanel.RefreshUI();
     }
 
     public void OnDrag(SlotItem slotItem)
     {
-        if (draggableItem.enabled)
+        if (inventoryPanel.draggableItem.enabled)
         {
-            draggableItem.transform.position = Input.mousePosition;
+            inventoryPanel.draggableItem.transform.position = Input.mousePosition;
         }
     }
 
     public void OnDrop(SlotItem slotItem)
     {
-        if (draggableItem.enabled)
+        if (inventoryPanel.draggableItem.enabled)
         {
-            draggableItem.color = new Color(1, 1, 1, 0);
-            draggableItem.enabled = false;
+            inventoryPanel.draggableItem.color = new Color(1, 1, 1, 0);
+            inventoryPanel.draggableItem.enabled = false;
         }
 
         Item draggedItem = draggedSlot.item;
@@ -137,10 +137,10 @@ public class InventoryManager : MonoBehaviour
         if (slotItem.item != null)
         {
             draggedSlot = slotItem;
-            draggableItem.sprite = slotItem.item.icon;
-            draggableItem.color = new Color(1, 1, 1, 1);
-            draggableItem.transform.position = Input.mousePosition;
-            draggableItem.enabled = true;
+            inventoryPanel.draggableItem.sprite = slotItem.item.icon;
+            inventoryPanel.draggableItem.color = new Color(1, 1, 1, 1);
+            inventoryPanel.draggableItem.transform.position = Input.mousePosition;
+            inventoryPanel.draggableItem.enabled = true;
         }
     }
 
@@ -149,27 +149,28 @@ public class InventoryManager : MonoBehaviour
         if (slotItem.item != null)
         {
             draggedSlot = null;
-            draggableItem.color = new Color(1, 1, 1, 0);
-            draggableItem.enabled = false;
+            inventoryPanel.draggableItem.color = new Color(1, 1, 1, 0);
+            inventoryPanel.draggableItem.enabled = false;
         }
     }
 
     public void UseItem(Item item)
     {
-        if (itemDetails.gameObject.activeSelf)
+        if (inventoryPanel.itemDetails.gameObject.activeSelf)
         {
-            itemDetails.Item = null;
-            itemDetails.gameObject.SetActive(false);
+            inventoryPanel.itemDetails.Item = null;
+            inventoryPanel.itemDetails.gameObject.SetActive(false);
         }
 
+        isPinned = false;
         inventory.RemoveItem(item);
-        UIinventory.RefreshUI();
+        inventoryPanel.RefreshUI();
     }
 
 
     public void DropItem(Item item)
     {
-        UIinventory.RefreshUI();
+        inventoryPanel.RefreshUI();
     }
 
     public void ClearInventory()

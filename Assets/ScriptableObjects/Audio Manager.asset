@@ -17,3 +17,4 @@ MonoBehaviour:
   - {fileID: 8300000, guid: b5171bf0415b40c4a8f19eee57fb7b17, type: 3}
   Win: {fileID: 8300000, guid: cbb41a1343c7e5d42b6c715c62b3cd7f, type: 3}
   Collect: {fileID: 8300000, guid: 1997bc0fec265ae44a36a3e95093c363, type: 3}
+  Hurt: {fileID: 8300000, guid: 4ba205e9918c7ba4483a501d958ab82d, type: 3}
